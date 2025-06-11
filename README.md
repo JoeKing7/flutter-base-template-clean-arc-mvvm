@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-## Flujo completo desde la UI hasta el dominio (según el libro)
+## Flujo completo desde la UI hasta el dominio (basado en los principios y recomendaciones del libro "System Design Blueprint" aplicado a Flutter + Clean Architecture, en conjunto con buenas prácticas modernas.)
 
                 [Usuario] → LoginScreen
                            ↓

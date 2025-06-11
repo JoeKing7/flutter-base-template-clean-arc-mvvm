@@ -1,36 +1,41 @@
-abstract class AppException implements Exception {
-  final String code;
-  final String title;
-  final String message;
-  final StackTrace? stackTrace;
+import 'package:base_template/core/errors/app_error.dart';
+import 'package:base_template/core/errors/error_codes.dart';
 
-  AppException({
-    required this.code,
-    required this.title,
-    required this.message,
-    this.stackTrace,
-  });
+// abstract class AppException implements Exception {
+//   final String code;
+//   final String title;
+//   final String message;
+//   final StackTrace? stackTrace;
 
-  @override
-  String toString() => '$runtimeType [$code]: $message';
-}
+//   AppException({
+//     required this.code,
+//     required this.title,
+//     required this.message,
+//     this.stackTrace,
+//   });
 
-class ParsingException extends AppException {
+//   @override
+//   String toString() => '$runtimeType [$code]: $message';
+// }
+
+class ParsingException extends AppError {
   ParsingException({
     super.message = "Error al interpretar los datos recibidos.",
+    super.messageDev,
     super.stackTrace,
   }) : super(
-          code: "GENx002",
+          code: ErrorCodes.parsingException,
           title: "Error de formato",
         );
 }
 
-class UnknownException extends AppException {
+class UnknownException extends AppError {
   UnknownException({
     super.message = "Ha ocurrido un error inesperado.",
+    super.messageDev,
     super.stackTrace,
   }) : super(
-          code: "GENx001",
+          code: ErrorCodes.unknownException,
           title: "Error desconocido",
         );
 }

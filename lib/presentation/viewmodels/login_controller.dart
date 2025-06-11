@@ -24,11 +24,12 @@ class LoginController extends GetxController {
       (failure) => Get.dialog(
         FullScreenError(
           title: 'Error',
-          message: '${failure.message}\n(Código: ${failure.code})',
+          message: failure.message,
+          code: failure.code,
         ),
       ),
       (data) async {
-        await PreferencesHelper.saveToken(data.token);
+        await PreferencesHelper.setToken(data.token);
         Get.offAllNamed(Routes.HOME);
       },
     );

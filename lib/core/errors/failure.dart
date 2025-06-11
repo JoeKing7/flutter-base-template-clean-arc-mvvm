@@ -1,4 +1,4 @@
-import 'package:base_template/core/errors/app_exception.dart';
+import 'package:base_template/core/errors/app_error.dart';
 
 class Failure {
   final String title;
@@ -7,7 +7,7 @@ class Failure {
 
   Failure({required this.code, required this.title, required this.message});
 
-  factory Failure.fromException(AppException e) => Failure(
+  factory Failure.fromException(AppError e) => Failure(
         code: e.code,
         title: e.title,
         message: e.message,

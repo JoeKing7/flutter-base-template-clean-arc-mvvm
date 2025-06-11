@@ -3,7 +3,7 @@ import 'package:base_template/core/errors/app_exception.dart';
 class LoginResponseModel {
   final String token;
   final LoginUserModel user;
-  // final List<ErrorMessageModel> errorMessages;
+  // final ErrorMessageGroupModel errorMessages;
 
   LoginResponseModel({
     required this.token,
@@ -16,14 +16,14 @@ class LoginResponseModel {
       return LoginResponseModel(
         token: json['token'],
         user: LoginUserModel.fromJson(json['user']),
-        // errorMessages: (json['errorMessages'] as List<dynamic>?)
-        // ?.map((e) => ErrorMessageModel.fromJson(e))
-        // .toList() ?? [],
+        // errorMessages: ErrorMessageGroupModel.fromJson(json['errores_mensajes']),
       );
     } catch (e) {
       // Propaga como excepción controlada
       throw ParsingException(
-          message: 'Lo sentimos, ocurrió un error intentado iniciar sesión');
+          message: 'Lo sentimos, ocurrió un error intentado iniciar sesión',
+          messageDev: e.toString(),
+          stackTrace: e is TypeError ? e.stackTrace : null);
     }
   }
 }
@@ -67,4 +67,21 @@ class ErrorMessageModel {
   }
 
   // AppError toAppError() => AppError(code: code, title: title, message: message);
+}
+
+class ErrorMessageGroupModel {
+  final Map<String, List<ErrorMessageModel>> sections;
+
+  ErrorMessageGroupModel({required this.sections});
+
+  factory ErrorMessageGroupModel.fromJson(Map<String, dynamic> json) {
+    final sections = <String, List<ErrorMessageModel>>{};
+
+    json.forEach((key, value) {
+      sections[key] =
+          (value as List).map((e) => ErrorMessageModel.fromJson(e)).toList();
+    });
+
+    return ErrorMessageGroupModel(sections: sections);
+  }
 }

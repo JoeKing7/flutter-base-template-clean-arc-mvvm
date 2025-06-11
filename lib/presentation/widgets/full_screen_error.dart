@@ -3,19 +3,24 @@ import 'package:get/get.dart';
 
 class FullScreenError extends StatelessWidget {
   /// A widget that displays a full-screen error message.
-  final String title;
+  final String? title;
   final String message;
+  final String? code;
   final String? goToRoute;
 
   const FullScreenError(
-      {super.key, required this.title, required this.message, this.goToRoute});
+      {super.key, this.title = 'Error', required this.message, this.code, this.goToRoute});
 
   @override
   Widget build(BuildContext context) {
+    final displayMessage = code != null
+        ? '$message\n(Código: $code)'
+        : message;
+
     return Scaffold(
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(title,
+          Text(title!,
               style: Theme.of(context)
                       .textTheme
                       .bodyLarge
@@ -25,7 +30,7 @@ class FullScreenError extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Text(
-              message,
+              displayMessage,
               textAlign: TextAlign.center,
               style: Theme.of(context)
                       .textTheme

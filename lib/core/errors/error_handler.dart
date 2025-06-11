@@ -1,11 +1,15 @@
 import 'dart:developer' as dev;
-import 'package:base_template/core/errors/app_error.dart';
+import 'package:base_template/core/errors/error_codes.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import 'package:base_template/core/errors/app_error.dart';
+import 'package:base_template/core/errors/error_reporter_service.dart';
 import 'package:base_template/core/errors/app_error_catalog.dart';
 import 'package:base_template/core/errors/app_error_report.dart';
 import 'app_exception.dart';
+
+final reporter = ErrorReporterService();
 
 Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
   try {
@@ -29,6 +33,15 @@ Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
     }
 
     final statusCode = e.response?.statusCode ?? 0;
+    reporter.report(
+      code: statusCode.toString(),
+      title: 'DioException',
+      message: e.toString(),
+      messageDev:
+          '-|Response:|- ${e.response} -|Request:|- ${e.requestOptions.baseUrl}${e.requestOptions.path} -|Request data:|- ${e.requestOptions.data} -|Request método:|- ${e.requestOptions.method}',
+      stackTrace: e.stackTrace,
+      screen: 'Unknown',
+    );
     switch (statusCode) {
       case 401:
         throw AppErrorCatalog.unauthorized;
@@ -40,13 +53,44 @@ Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
         throw AppErrorCatalog.unknown(stackTrace: e.stackTrace);
     }
   } on FormatException catch (e) {
+    reporter.report(
+      code: ErrorCodes.parsingException,
+      title: 'FormatException',
+      message: e.toString(),
+      messageDev: e.source ?? '',
+      stackTrace: e.source,
+      screen: 'Unknown',
+    );
     throw ParsingException(message: e.message);
   } on TypeError catch (e) {
+    reporter.report(
+      code: ErrorCodes.parsingException,
+      title: 'TypeError',
+      message: e.toString(),
+      messageDev: '',
+      stackTrace: e.stackTrace,
+      screen: 'Unknown',
+    );
     throw ParsingException(stackTrace: e.stackTrace);
     // } on AppException catch (e) {
     //   // Aquí no debería lanzar UnknownException
     //   rethrow; // ← permite propagar sin alterar
   } catch (e, stack) {
+    final error = e is AppError
+        ? e
+        : AppError(
+            code: ErrorCodes.unknownException,
+            title: 'Error desconocido',
+            message: e.toString(),
+          );
+    reporter.report(
+      code: error.code,
+      title: error.title,
+      message: error.message,
+      messageDev: error.messageDev ?? '',
+      stackTrace: error.stackTrace ?? stack,
+      screen: 'Unknown',
+    );
     if (e is AppError) {
       throw AppError(
         code: e.code,

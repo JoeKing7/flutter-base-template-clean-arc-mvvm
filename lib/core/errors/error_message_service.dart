@@ -3,21 +3,27 @@ import 'package:base_template/data/mappers/login_api_mapper.dart';
 import 'package:base_template/data/models/login_response_model.dart';
 
 class ErrorMessageService {
-  final Map<String, AppError> _errors = {};
+  final Map<String, Map<String, AppError>> _errors = {};
 
-  void load(List<ErrorMessageModel> errors) {
-    for (final e in errors) {
-      _errors[e.code] = e.toAppError();
-    }
+  void load(ErrorMessageGroupModel groupModel) {
+    _errors.clear();
+    groupModel.sections.forEach((screen, messages) {
+      _errors[screen] = {
+        for (final e in messages) e.code: e.toAppError()
+      };
+    });
   }
 
-  AppError get(String code) {
-    return _errors[code] ??
-        AppError(
-          code: code,
-          title: 'Error desconocido',
-          message: 'Este error no está definido en el catálogo.',
-        );
+  AppError get(String screen, String code) {
+    final screenErrors = _errors[screen];
+    if (screenErrors != null && screenErrors.containsKey(code)) {
+      return screenErrors[code]!;
+    }
+    return AppError(
+      code: code,
+      title: 'Error desconocido',
+      message: 'Este error no está definido para $screen.',
+    );
   }
 
   void clear() => _errors.clear();
@@ -31,7 +37,7 @@ class ErrorMessageService {
 // En vez de usar AppErrorCatalog, haces:
 
 
-// final error = errorMessageService.get('USR_001');
+// final error = errorMessageService.get('home', 'USR_001');
 // Get.dialog(FullScreenError(
 //   title: error.title,
 //   message: '${error.message} (${error.code})',
