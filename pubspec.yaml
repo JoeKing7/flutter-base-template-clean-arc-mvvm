@@ -28,8 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  connectivity_plus: ^6.1.4
   cupertino_icons: ^1.0.8
+  dartz: ^0.10.1
   dio: ^5.8.0+1
+  dio_cache_interceptor: ^4.0.3
   firebase_auth: ^5.5.4
   firebase_core: ^3.13.1
   firebase_messaging: ^15.2.6
@@ -37,6 +40,7 @@ dependencies:
     sdk: flutter
   flutter_dotenv: ^5.2.1
   get: ^4.7.2
+  intl: ^0.20.2
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   logger: ^2.5.0
@@ -44,9 +48,11 @@ dependencies:
   shared_preferences: ^2.5.3
 
 dev_dependencies:
+  build_runner: ^2.4.11
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  isar_generator: ^3.1.0+1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -57,9 +63,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    # - assets/images/
+    # - assets/i18n/
+    # - assets/lottie/
+    # - google_fonts/Poppins/
+    - .env
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

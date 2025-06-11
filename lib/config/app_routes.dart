@@ -1,6 +1,12 @@
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 
-class AppRoutes {
+abstract class Routes {
+  static const LOGIN = '/login';
+  static const HOME = '/home';
+}
+
+
+// class AppRoutes {
   // static const String splashScreen = '/splash_screen';
   // static const String homeScreen = '/home_screen';
   // static const String loginScreen = '/login_screen';
@@ -63,4 +69,4 @@ class AppRoutes {
   //       middlewares: [AuthMiddleware()],
   //     ),
   //   ];
-}
+// }
