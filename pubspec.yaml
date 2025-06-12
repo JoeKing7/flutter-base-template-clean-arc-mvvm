@@ -31,7 +31,7 @@ dependencies:
   connectivity_plus: ^6.1.4
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
-  device_info_plus: ^11.4.0
+  device_info_plus: ^11.3.0
   dio: ^5.8.0+1
   dio_cache_interceptor: ^4.0.3
   firebase_auth: ^5.5.4
@@ -41,15 +41,19 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
+  flutter_secure_storage: ^9.2.4
+  flutter_localization: ^0.3.0
   get: ^4.7.2
-  intl: ^0.20.2
+  intl: ^0.19.0
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   logger: ^2.5.0
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
+  pointycastle: ^4.0.0
   sentry_flutter: ^8.14.2
   shared_preferences: ^2.5.3
+  translations_loader: ^1.0.2
 
 dev_dependencies:
   build_runner: ^2.4.11
@@ -68,9 +72,9 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    # - assets/images/
-    # - assets/i18n/
-    # - assets/lottie/
+    - assets/images/
+    - assets/i18n/
+    - assets/lottie/
     # - google_fonts/Poppins/
     - .env
   # An image asset can refer to one or more resolution-specific "variants", see

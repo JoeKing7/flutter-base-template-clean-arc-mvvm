@@ -1,8 +1,9 @@
 import 'dart:developer' as dev;
-import 'package:base_template/core/errors/error_codes.dart';
 import 'package:dio/dio.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
+import 'package:base_template/core/errors/error_codes.dart';
+import 'package:base_template/core/utils/global_functions.dart';
+import 'package:base_template/presentation/widgets/full_screen_error.dart';
 import 'package:base_template/core/errors/app_error.dart';
 import 'package:base_template/core/errors/error_reporter_service.dart';
 import 'package:base_template/core/errors/app_error_catalog.dart';
@@ -14,14 +15,9 @@ final reporter = ErrorReporterService();
 Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
   try {
     // Primero validamos que haya conexión
-    final connectivity = await Connectivity().checkConnectivity();
-    final check = connectivity.firstWhere(
-      (element) =>
-          element == ConnectivityResult.mobile ||
-          element == ConnectivityResult.wifi,
-      orElse: () => ConnectivityResult.none,
-    );
-    if (check == ConnectivityResult.none) {
+
+    final isConnected = await GlobalFunctions.isConnectedToNetwork();
+    if (!isConnected) {
       throw AppErrorCatalog.noInternetConnection;
     }
 
@@ -43,6 +39,8 @@ Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
       screen: 'Unknown',
     );
     switch (statusCode) {
+      case 400:
+        throw AppErrorCatalog.badRequest;
       case 401:
         throw AppErrorCatalog.unauthorized;
       case 403:
@@ -99,6 +97,34 @@ Future<T> safeApiCall<T>(Future<T> Function() apiCall) async {
       );
     }
     throw UnknownException(stackTrace: stack);
+  }
+}
+
+void handleCatchError({
+  required Function function,
+  String title = 'Error',
+  String message = 'Lo sentimos, ocurrió un error inesperado.',
+  String messageDev = '',
+  String screen = 'Unknown',
+  String code = ErrorCodes.unknownException,
+  StackTrace? stackTrace,
+}) {
+  try {
+    function();
+  } catch (e) {
+    FullScreenError(
+      title: title,
+      message: message,
+      code: code,
+    );
+    reporter.report(
+      code: code,
+      title: title,
+      message: message,
+      messageDev: '$messageDev : ${e.toString()}',
+      stackTrace: e is StackTrace ? e : stackTrace,
+      screen: screen,
+    );
   }
 }
 

@@ -30,6 +30,13 @@ class AppErrorCatalog {
     message: 'Por favor, verifica tu conexión a internet.',
   );
 
+  // Solicitud incorrecta
+  static final badRequest = AppError(
+    code: ErrorCodes.badRequest,
+    title: 'Solicitud incorrecta',
+    message: 'Lo sentimos, ocurrió un error en la solicitud. Intenta de nuevo.',
+  );
+
   // No autorizado
   static final unauthorized = AppError(
     code: ErrorCodes.unauthorized,

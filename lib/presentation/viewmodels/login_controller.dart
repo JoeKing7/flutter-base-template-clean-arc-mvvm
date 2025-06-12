@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
+import 'package:base_template/services/session_service.dart';
 import 'package:base_template/data/dtos/login_request_dto.dart';
 import '../../../domain/usecases/login_usecase.dart';
-import '../../../core/utils/preferences_helper.dart';
 import '../widgets/full_screen_error.dart';
 import '../../../config/app_routes.dart';
 
@@ -29,7 +29,7 @@ class LoginController extends GetxController {
         ),
       ),
       (data) async {
-        await PreferencesHelper.setToken(data.token);
+        await SessionService.setToken(data.token);
         Get.offAllNamed(Routes.HOME);
       },
     );

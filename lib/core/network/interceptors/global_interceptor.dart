@@ -1,10 +1,18 @@
-import 'package:base_template/config/app_routes.dart';
-import 'package:base_template/core/network/constants/api_endpoints.dart';
-import 'package:base_template/core/utils/preferences_helper.dart';
-import 'package:base_template/presentation/widgets/full_screen_error.dart';
+import 'dart:convert';
+import 'package:base_template/core/errors/error_codes.dart';
+import 'package:base_template/core/errors/error_handler.dart';
 import 'package:dio/dio.dart';
 
+import 'package:base_template/core/errors/error_reporter_service.dart';
+import 'package:base_template/data/models/response_api_model.dart';
+import 'package:base_template/core/security/crypto_service.dart';
+import 'package:base_template/services/session_service.dart';
+import 'package:base_template/config/app_routes.dart';
+import 'package:base_template/core/network/constants/api_endpoints.dart';
 import 'package:base_template/core/network/client/api_provider.dart';
+import 'package:base_template/presentation/widgets/full_screen_error.dart';
+
+final reporter = ErrorReporterService();
 
 class GlobalInterceptor extends Interceptor {
   Dio dio = Dio(BaseOptions(baseUrl: ApiProvider.appBaseUrl));
@@ -30,21 +38,52 @@ class GlobalInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (options.extra.containsKey('requiresAuthToken')) {
-      if (options.extra['requiresAuthToken'] == true) {
-        // final token =
+    handleCatchError(
+      function: () async {
+        final appLang = await SessionService.getAppLang();
+        final dataEnc =
+            await CryptoService.encryptData(jsonEncode(options.data));
+        options.data = jsonDecode('{"data": "$dataEnc"}');
+        final exceptionsToken = [
+          '/auth/app/check-user-account',
+        ];
+        if (exceptionsToken.contains(options.path)) {
+          options.headers.addAll(
+            <String, Object?>{
+              'accept-language': appLang,
+            },
+          );
+          return handler.next(options);
+        }
 
-        // options.headers.addAll(
-        //   <String, Object?>{'Authorization': 'Bearer $token'},
-        // );
-      }
-      options.extra.remove('requiresAuthToken');
-    }
-    options.headers.addAll(
-      // <String, Object?>{'x-tenant-id': Preferences.userBank},
-      <String, Object?>{'x-tenant-id': ''},
+        options.headers.addAll(
+          <String, Object?>{
+            'Authorization': 'Bearer ${await SessionService.getToken()}',
+            'accept-language': appLang,
+          },
+        );
+        // if (options.extra.containsKey('requiresAuthToken')) {
+        //   if (options.extra['requiresAuthToken'] == true) {
+
+        //   }
+
+        //   options.extra.remove('requiresAuthToken');
+        // }
+        return handler.next(options);
+      },
+      code: ErrorCodes.onRequest,
+      title: 'Error de solicitud',
+      message: 'Error al realizar la solicitud',
+      messageDev: 'Error al interceptar la solicitud: ${options.path}',
     );
-    return handler.next(options);
+    // try {
+
+    // } catch (e) {
+    //   FullScreenError(
+    //     title: 'Error',
+    //     message: 'Lo sentimos, ocurrió un error al realizar la solicitud.',
+    //   );
+    // }
   }
 
   /// This method intercepts an incoming response before it reaches Dio.
@@ -76,8 +115,23 @@ class GlobalInterceptor extends Interceptor {
   void onResponse(
     Response response,
     ResponseInterceptorHandler handler,
-  ) {
-    return handler.next(response);
+  ) async {
+    handleCatchError(
+      function: () async {
+        if (response.data["data"] != null) {
+          final ResponseApiModel enc = ResponseApiModel.fromJson(response.data);
+          final decrypt = await CryptoService.decryptData(enc.data);
+          response.data = jsonDecode(decrypt);
+        }
+        return handler.next(response);
+      },
+      code: ErrorCodes.onResponse,
+      title: 'Error de respuesta',
+      message: 'Error al procesar la respuesta',
+      messageDev:
+          'Error al interceptar la respuesta: ${response.requestOptions.path}',
+    );
+
     // final success = response.data['headers']['error'] == 0;
 
     // if (success) return handler.next(response);
@@ -98,11 +152,12 @@ class GlobalInterceptor extends Interceptor {
       FullScreenError(
         title: 'Sesión de usuario',
         message: 'Su sesión ha expirado, por favor inicie sesión nuevamente.',
+        code: '401',
         goToRoute: Routes.LOGIN,
       );
 
       // Refresh the user's authentication token.
-
+// await refreshToken();
       // Retry the request.
       // try {
       //   handler.resolve(await _retry(err.requestOptions));
@@ -117,8 +172,42 @@ class GlobalInterceptor extends Interceptor {
     handler.next(err);
   }
 
+// Future<Response<dynamic>> refreshToken() async {
+//     try {
+//       final refreshToken = Preferences.authRefreshToken;
+//       final data = {'refreshToken': refreshToken};
+//       final dataEnc = await CryptoService.encryptData(jsonEncode(data));
+//       final dataToSend = jsonDecode('{"data": "$dataEnc"}');
+//       var response =
+//           await dio.post(HttpEndpoints.auth(AuthEndpoint.REFRESH_TOKEN),
+//               data: dataToSend,
+//               options: Options(
+//                 headers: {
+//                   'x-tenant-id': 'TENANT_${Preferences.tenant.toUpperCase()}',
+//                 },
+//               ));
+
+//       // on success response, deserialize the response
+//       if (response.statusCode == 200 || response.statusCode == 201) {
+//         final ResponseData enc = ResponseData.fromJson(response.data);
+//         final keies = enc.data.split(':');
+//         final decrypt = GlobalFunctions.decryptData(keies[0], keies[1]);
+//         final dataDec = jsonDecode(decrypt);
+
+//         final newData = RefreshTokenMapper.refreshTokenJsonToEntity(dataDec);
+//         Preferences.authToken = newData.token;
+//         return response;
+//       }
+//       return response;
+//     } on DioException catch (e) {
+//       throw HandleErrors.handleHttpErrors(e);
+//     } catch (e) {
+//       throw HandleErrors.handleCatchError(e.toString());
+//     }
+//   }
+
   Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
-    final token = PreferencesHelper.getToken();
+    final token = SessionService.getToken();
 
     final options = Options(
       method: 'GET',

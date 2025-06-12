@@ -1,8 +1,9 @@
 import 'dart:convert';
-
-import 'package:base_template/core/utils/device_info_helper.dart';
-import 'package:base_template/core/utils/preferences_helper.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+
+import 'package:base_template/core/security/crypto_service.dart';
+import 'package:base_template/core/utils/device_info_helper.dart';
+import 'package:base_template/services/session_service.dart';
 
 class ErrorReporterService {
   Future<void> report({
@@ -16,8 +17,8 @@ class ErrorReporterService {
   }) async {
     final now = DateTime.now().toIso8601String();
     final deviceInfo = await DeviceInfoHelper.getDeviceInfo();
-    final email = await PreferencesHelper.getEmail();
-    final userId = await PreferencesHelper.getUserIdentification();
+    final email = await SessionService.getEmail();
+    final userId = await SessionService.getUserIdentification();
 
     final report = {
       'userId': userId,
@@ -34,8 +35,10 @@ class ErrorReporterService {
       // Puedes agregar aquí: userId, email, device, version, etc.
     };
 
+    final data = await CryptoService.encryptData(report.toString());
     // 🔁 Aquí decides a dónde enviarlo:
-    print('📤 ERROR REPORT enviado: ${JsonEncoder().convert(report)}');
+    print(
+        '📤 ERROR REPORT enviado: ${JsonEncoder().convert(await CryptoService.decryptData(data))}');
 
     // Opción 1: Firebase Crashlytics
     // await FirebaseCrashlytics.instance.recordError(...);
@@ -43,17 +46,28 @@ class ErrorReporterService {
     // Opción 2: Sentry
     // Sentry.captureException(...);
     Sentry.configureScope((scope) {
-      scope.setUser(SentryUser(id: userId, email: email, username: '', ipAddress: '', segment: ''));
+      scope.setUser(SentryUser(
+          id: userId, email: email, username: '', ipAddress: '', segment: ''));
     });
 
-    await Sentry.captureException(report, stackTrace: stackTrace, withScope: (scope) {
+    await Sentry.captureException(
+      data,
+      stackTrace: stackTrace,
+      hint: Hint()..set('Title', code),
+      withScope: (scope) {
         scope.setTag('screen', screen ?? 'unknown');
         scope.setTag('code', code);
+        scope.setTag(
+            'messageDev',
+            messageDev.length > 120
+                ? '${messageDev.substring(0, 120)}...'
+                : messageDev);
         scope.setContexts('device_info', deviceInfo);
         if (extra != null) {
           scope.setContexts('extra_data', extra);
         }
-    },);
+      },
+    );
 
     // Opción 3: Enviar a API
     // await dio.post('/api/errors/report', data: report);
