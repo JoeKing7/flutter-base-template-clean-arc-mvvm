@@ -17,6 +17,7 @@ class LoginController extends GetxController {
 
   Future<void> signIn() async {
     isLoading.value = true;
+    await Future.delayed(const Duration(seconds: 2));
     final result = await loginUseCase.signIn(
       LoginRequestDTO(username: user.value, password: password.value),
     );

@@ -1,0 +1,30 @@
+import 'package:flutter/material.dart';
+import 'app_colors.dart';
+
+class AppTextStyles {
+  static TextStyle title(BuildContext context) => TextStyle(
+      fontSize: _scale(context, 20),
+      fontWeight: FontWeight.bold,
+      color: AppColors.blackWhite(Theme.of(context).brightness));
+
+  static TextStyle subtitle(BuildContext context) => TextStyle(
+      fontSize: _scale(context, 16),
+      fontWeight: FontWeight.w500,
+      color: AppColors.grey(Theme.of(context).brightness));
+
+  static TextStyle body(BuildContext context) => TextStyle(
+      fontSize: _scale(context, 14),
+      color: AppColors.blackWhite(Theme.of(context).brightness));
+
+  static TextStyle button(BuildContext context) => TextStyle(
+      fontSize: _scale(context, 16),
+      fontWeight: FontWeight.bold,
+      color: Colors.white);
+
+  static double _scale(BuildContext context, double base) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth >= 600) return base * 1.2; // tablets
+    if (screenWidth <= 320) return base * 0.9; // teléfonos pequeños
+    return base;
+  }
+}

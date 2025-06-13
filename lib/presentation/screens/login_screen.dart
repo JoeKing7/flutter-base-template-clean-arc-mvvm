@@ -1,12 +1,13 @@
-import 'package:base_template/presentation/widgets/full_screen_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:base_template/presentation/widgets/button_theme_toggle.dart';
+import 'package:base_template/presentation/widgets/overlay_loading.dart';
 import '../viewmodels/login_controller.dart';
 import '../../../core/utils/form_validators.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends GetView<LoginController> {
   final _formKey = GlobalKey<FormState>();
-  final controller = Get.find<LoginController>();
 
   LoginScreen({super.key});
 
@@ -14,39 +15,41 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Obx(() => Stack(
-              children: [
-                Form(
-                  key: _formKey,
-                  child: ListView(
-                    padding: const EdgeInsets.all(20),
-                    children: [
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Usuario'),
-                        onChanged: (val) => controller.user.value = val,
-                      ),
-                      TextFormField(
-                        decoration:
-                            const InputDecoration(labelText: 'Contraseña'),
-                        onChanged: (val) => controller.password.value = val,
-                        obscureText: true,
-                        validator: validatePassword,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            controller.signIn();
-                          }
-                        },
-                        child: const Text('Iniciar sesión'),
-                      ),
-                    ],
+        body: SizedBox(
+            child: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Usuario'),
+                    onChanged: (val) => controller.user.value = val,
                   ),
-                ),
-                if (controller.isLoading.value) const FullScreenLoader()
-              ],
-            )),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Contraseña'),
+                    onChanged: (val) => controller.password.value = val,
+                    obscureText: true,
+                    validator: validatePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        overlayLoading(asyncFunction: () async {
+                          await controller.signIn();
+                        });
+                      }
+                    },
+                    child: const Text('Iniciar sesión'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        )),
+        floatingActionButton: buttonThemeToggle(),
       ),
     );
   }

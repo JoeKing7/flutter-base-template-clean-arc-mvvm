@@ -20,3 +20,18 @@ class LoginUserEntity {
       required this.email,
       required this.rol});
 }
+
+class LoginUserRuleEntity {
+  final String action;
+  final String subject;
+
+  LoginUserRuleEntity({
+    required this.action,
+    required this.subject,
+  });
+
+  Map<String, dynamic> toJson() => {
+        "action": action,
+        "subject": subject,
+      };
+}

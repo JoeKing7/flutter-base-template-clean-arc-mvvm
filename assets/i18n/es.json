@@ -1,3 +1,6 @@
 {
-  "code": "ES"
+  "code": "ES",
+  "global": {
+    "isLoadingText": "Cargando..."
+  }
 }

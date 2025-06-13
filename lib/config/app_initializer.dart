@@ -10,13 +10,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:base_template/config/app_pages.dart';
 import 'package:base_template/core/utils/app_translations.dart';
 import 'package:base_template/config/bindings/initial_bindings.dart';
-import 'package:base_template/core/config/app_config.dart';
 import 'package:base_template/core/config/env_config.dart';
 import 'package:base_template/core/utils/preferences_helper.dart';
 import 'package:base_template/presentation/widgets/error_custom.dart';
 import 'package:base_template/services/session_service.dart';
 import 'package:translations_loader/translations_loader.dart';
 import 'package:base_template/presentation/viewmodels/app_controller.dart';
+import 'package:base_template/core/config/app_colors.dart';
+import 'package:base_template/core/config/app_theme.dart';
 
 class AppInitializer {
   Future<void> init() async {
@@ -34,8 +35,6 @@ class AppInitializer {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AppConfig.translations = await TranslationsLoader.loadTranslations(
-        'assets/i18n', AppConfig.supportedLocales);
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -56,7 +55,8 @@ class AppInitializer {
     // Agregar estas líneas antes de SentryFlutter.init
     final appController = Get.put(AppController(), permanent: true);
     await appController.initializeLocale();
-
+    appController.translations = await TranslationsLoader.loadTranslations(
+        'assets/i18n', appController.supportedLocales);
     await SentryFlutter.init(
       (options) {
         options.dsn = envConfig.sentryDns; // Configura Sentry con el DSN
@@ -101,57 +101,64 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final appController = Get.find<AppController>();
+
     return AnnotatedRegion(
       value: SystemUiOverlayStyle(
-        // statusBarColor: ColorsTheme.primary, //top status bar
+        statusBarColor:
+            AppColors.primary(Theme.of(context).brightness), //top status bar
         systemNavigationBarColor: Colors.black,
         statusBarIconBrightness: Brightness.light, // status bar icons' color
         statusBarBrightness: Brightness.light,
         systemNavigationBarIconBrightness:
             Brightness.dark, //navigation bar icons' color
       ),
-      child: GetMaterialApp(
-        builder: (context, child) {
-          return MediaQuery.withClampedTextScaling(
-              minScaleFactor: 0.8, maxScaleFactor: 1.0, child: child!);
-        },
-        initialBinding: InitialBindings(),
-        theme: AppConfig.appTheme,
-        debugShowCheckedModeBanner: false,
-        translations: AppTranslations(AppConfig.translations),
-        fallbackLocale: AppConfig.supportedLocales[0],
-        locale: Get.find<AppController>().currentLocale,
-        supportedLocales: AppConfig.supportedLocales,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        initialRoute: AppPages.initial,
-        getPages: AppPages.routes,
+      child: Obx(
+        () => GetMaterialApp(
+          builder: (context, child) {
+            return MediaQuery.withClampedTextScaling(
+                minScaleFactor: 0.8, maxScaleFactor: 1.0, child: child!);
+          },
+          initialBinding: InitialBindings(),
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: appController.themeMode,
+          debugShowCheckedModeBanner: false,
+          translations: AppTranslations(appController.translations),
+          fallbackLocale: appController.supportedLocales[0],
+          locale: appController.currentLocale,
+          supportedLocales: appController.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          initialRoute: AppPages.initial,
+          getPages: AppPages.routes,
+        ),
       ),
     );
   }
 }
 
-Future<Locale> getLocale() async {
+Future<Locale> getLocale(AppController appController) async {
   final lang = await SessionService.getAppLang();
   if (lang > -1) {
-    return AppConfig.supportedLocales[lang];
+    return appController.supportedLocales[lang];
   }
 
   if (Get.deviceLocale.toString().split('_').contains('es')) {
     SessionService.setAppLang(1);
-    return AppConfig.supportedLocales[1];
+    return appController.supportedLocales[1];
   }
 
   if (Get.deviceLocale.toString().split('_').contains('en')) {
     SessionService.setAppLang(0);
-    return AppConfig.supportedLocales[0];
+    return appController.supportedLocales[0];
   }
 
   SessionService.setAppLang(0);
-  return AppConfig.supportedLocales[0];
+  return appController.supportedLocales[0];
 }
 
 class MyHttpOverrides extends HttpOverrides {
