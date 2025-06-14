@@ -1,4 +1,5 @@
 import 'package:base_template/core/config/app_text_styles.dart';
+import 'package:base_template/presentation/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:animate_do/animate_do.dart';
@@ -33,15 +34,11 @@ Future<Null> overlayLoading({
               'assets/lottie/loading-circular.json',
               height: 150,
             ),
-            Text(
+            AppTextTitle(
               textTitle ?? 'global.isLoadingText'.tr,
-              style: AppTextStyles.title(Get.context!).copyWith(
-                  color: AppColors.primary(Theme.of(Get.context!).brightness)),
             ),
-            Text(
+            AppTextTitle(
               textSubTitle!,
-              style: AppTextStyles.subtitle(Get.context!).copyWith(
-                  color: AppColors.primary(Theme.of(Get.context!).brightness)),
             ),
           ],
         ),

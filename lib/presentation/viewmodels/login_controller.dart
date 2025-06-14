@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:base_template/services/session_service.dart';
@@ -11,15 +12,17 @@ class LoginController extends GetxController {
 
   LoginController(this.loginUseCase);
 
-  final user = ''.obs;
-  final password = ''.obs;
+  final userController = TextEditingController();
+  final passwordController = TextEditingController();
+
   final isLoading = false.obs;
 
   Future<void> signIn() async {
     isLoading.value = true;
     await Future.delayed(const Duration(seconds: 2));
     final result = await loginUseCase.signIn(
-      LoginRequestDTO(username: user.value, password: password.value),
+      LoginRequestDTO(
+          username: userController.text, password: passwordController.text),
     );
     result.fold(
       (failure) => Get.dialog(
