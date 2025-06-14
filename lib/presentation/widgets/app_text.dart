@@ -7,13 +7,16 @@ mixin TextPropertiesMixin {
   TextAlign? get align;
   int? get maxLines;
   TextOverflow? get overflow;
+  Color? get color;
 
   Widget buildText(BuildContext context, TextStyle baseStyle) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       child: Text(
         text,
-        style: baseStyle,
+        style: baseStyle.copyWith(
+          color: color ?? baseStyle.color,
+        ),
         textAlign: align,
         maxLines: maxLines,
         overflow: overflow ?? TextOverflow.ellipsis,
@@ -31,9 +34,11 @@ class AppTextTitle extends StatelessWidget with TextPropertiesMixin {
   final int? maxLines;
   @override
   final TextOverflow? overflow;
+  @override
+  final Color? color;
 
-  const AppTextTitle(this.text,
-      {super.key, this.align, this.maxLines, this.overflow});
+  AppTextTitle(this.text,
+      {super.key, this.align, this.maxLines, this.overflow, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +55,11 @@ class AppTextSubtitle extends StatelessWidget with TextPropertiesMixin {
   final int? maxLines;
   @override
   final TextOverflow? overflow;
+  @override
+  final Color? color;
 
-  const AppTextSubtitle(this.text,
-      {super.key, this.align, this.maxLines, this.overflow});
+  AppTextSubtitle(this.text,
+      {super.key, this.align, this.maxLines, this.overflow, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +76,11 @@ class AppTextBodyLarge extends StatelessWidget with TextPropertiesMixin {
   final int? maxLines;
   @override
   final TextOverflow? overflow;
+  @override
+  final Color? color;
 
-  const AppTextBodyLarge(this.text,
-      {super.key, this.align, this.maxLines, this.overflow});
+  AppTextBodyLarge(this.text,
+      {super.key, this.align, this.maxLines, this.overflow, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +97,11 @@ class AppTextBodyMedium extends StatelessWidget with TextPropertiesMixin {
   final int? maxLines;
   @override
   final TextOverflow? overflow;
+  @override
+  final Color? color;
 
-  const AppTextBodyMedium(this.text,
-      {super.key, this.align, this.maxLines, this.overflow});
+  AppTextBodyMedium(this.text,
+      {super.key, this.align, this.maxLines, this.overflow, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +118,11 @@ class AppTextBodySmall extends StatelessWidget with TextPropertiesMixin {
   final int? maxLines;
   @override
   final TextOverflow? overflow;
+  @override
+  final Color? color;
 
-  const AppTextBodySmall(this.text,
-      {super.key, this.align, this.maxLines, this.overflow});
+  AppTextBodySmall(this.text,
+      {super.key, this.align, this.maxLines, this.overflow, this.color});
 
   @override
   Widget build(BuildContext context) {
