@@ -214,7 +214,7 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
   }
 }
 
-class TextFormFieldSearchCustom extends StatelessWidget {
+class AppTextFormFieldSearch extends StatelessWidget {
   final bool? isNumericKeyboard;
   final TextEditingController textEditingController;
   final String labelText;
@@ -237,7 +237,7 @@ class TextFormFieldSearchCustom extends StatelessWidget {
   final bool? autocorrect;
   final TextCapitalization? textCapitalization;
 
-  const TextFormFieldSearchCustom({
+  const AppTextFormFieldSearch({
     super.key,
     required this.textEditingController,
     required this.labelText,
@@ -314,7 +314,7 @@ class TextFormFieldSearchCustom extends StatelessWidget {
   }
 }
 
-class TextFormFieldOtpCodeCustom extends StatelessWidget {
+class AppTextFormFieldOtpCode extends StatelessWidget {
   final TextEditingController textEditingController;
 
   final String? Function(String?)? validator;
@@ -327,7 +327,7 @@ class TextFormFieldOtpCodeCustom extends StatelessWidget {
   final Function(String)? onChanged;
   final Function(String)? onFieldSubmitted;
 
-  const TextFormFieldOtpCodeCustom(
+  const AppTextFormFieldOtpCode(
       {super.key,
       required this.textEditingController,
       this.validator,

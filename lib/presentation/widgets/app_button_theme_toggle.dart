@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:base_template/presentation/viewmodels/app_controller.dart';
 
-Widget buttonThemeToggle() {
+Widget appButtonThemeToggle() {
   final appController = Get.find<AppController>();
   return Obx(
     () => FloatingActionButton(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class CustomWidgetError extends StatelessWidget {
+class AppWidgetError extends StatelessWidget {
   final FlutterErrorDetails errorDetails;
 
-  const CustomWidgetError({
+  const AppWidgetError({
     super.key,
     required this.errorDetails,
   });

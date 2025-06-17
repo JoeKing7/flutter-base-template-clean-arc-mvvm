@@ -1,11 +1,12 @@
-import 'package:base_template/core/config/app_colors.dart';
-import 'package:base_template/presentation/widgets/app_text.dart';
-import 'package:base_template/presentation/widgets/buttons.dart';
-import 'package:base_template/presentation/widgets/text_form_field_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:base_template/presentation/widgets/button_theme_toggle.dart';
+import 'package:base_template/core/config/app_colors.dart';
+import 'package:base_template/presentation/widgets/app_dialog.dart';
+import 'package:base_template/presentation/widgets/app_text.dart';
+import 'package:base_template/presentation/widgets/app_buttons.dart';
+import 'package:base_template/presentation/widgets/app_text_form_field.dart';
+import 'package:base_template/presentation/widgets/app_button_theme_toggle.dart';
 import 'package:base_template/presentation/widgets/overlay_loading.dart';
 import '../viewmodels/login_controller.dart';
 import '../../../core/utils/form_validators.dart';
@@ -28,6 +29,7 @@ class LoginScreen extends GetView<LoginController> {
                 'Ingresa tus credenciales para acceder a tu cuenta',
                 maxLines: 2,
                 align: TextAlign.center,
+                color: AppColors.darkSuccess,
               ),
               AppTextBodyLarge('Body'),
               Form(
@@ -62,13 +64,31 @@ class LoginScreen extends GetView<LoginController> {
                         },
                       ),
                     ),
+                    AppFilledButton(
+                        color: AppColors.darkSuccess,
+                        text: 'Test Dialog',
+                        onTap: () async {
+                          await AppDialog.show(
+                            icon: Icons.warning,
+                            iconColor: Colors.orange,
+                            title: 'Prueba title',
+                            content:
+                                const Text('esto es una prueba de diálogo'),
+                            cancelText: 'Cancelar',
+                            confirmText: 'Sí, salir',
+                            isDestructive: false,
+                            onConfirm: () {
+                              print('Confirmado!');
+                            },
+                          );
+                        })
                   ],
                 ),
               ),
             ],
           ),
         ),
-        floatingActionButton: buttonThemeToggle(),
+        floatingActionButton: appButtonThemeToggle(),
       ),
     );
   }

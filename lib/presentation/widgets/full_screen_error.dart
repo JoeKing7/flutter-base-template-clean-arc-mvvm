@@ -1,6 +1,6 @@
 import 'package:base_template/core/config/app_colors.dart';
 import 'package:base_template/presentation/widgets/app_text.dart';
-import 'package:base_template/presentation/widgets/buttons.dart';
+import 'package:base_template/presentation/widgets/app_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,6 +1,7 @@
 // import 'package:get/get.dart';
 
 abstract class Routes {
+  static const SPLASH_SCREEN = '/splash_screen';
   static const LOGIN = '/login';
   static const HOME = '/home';
 }

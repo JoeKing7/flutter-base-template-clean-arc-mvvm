@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 import 'package:base_template/domain/entities/login_entity.dart';
 import 'package:base_template/services/session_service.dart';
+import 'package:base_template/services/user_inactivity_service.dart';
 
 class AppController extends GetxController {
+  late final UserInactivityService userInactivityService;
+
   final supportedLocales = [Locale('en', 'US'), Locale('es', 'CO')];
   late Map<String, Map<String, String>> translations;
   late final Rx<Locale> _currentLocale;
   final _themeMode = ThemeMode.system.obs;
-
   final userRules = RxList<LoginUserRuleEntity>([]);
 
   Locale get currentLocale => _currentLocale.value;
@@ -19,7 +22,12 @@ class AppController extends GetxController {
   void onInit() {
     super.onInit();
     _currentLocale = supportedLocales[0].obs;
+    final brightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    setTheme(brightness);
     initializeLocale();
+    userInactivityService = Get.find<UserInactivityService>();
+    userInactivityService.start();
   }
 
   Future<void> initializeLocale() async {
@@ -44,8 +52,10 @@ class AppController extends GetxController {
         _themeMode.value == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
   }
 
-  void setTheme(ThemeMode mode) {
-    _themeMode.value = mode;
+  void setTheme(Brightness brightness) {
+    //ThemeMode mode
+    _themeMode.value =
+        brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
   }
 
   bool get isDarkMode => _themeMode.value == ThemeMode.dark;

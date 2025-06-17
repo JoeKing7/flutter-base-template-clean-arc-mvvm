@@ -1,6 +1,12 @@
 {
   "code": "EN",
   "global": {
-    "isLoadingText": "Loading..."
+    "isLoadingText": "Loading...",
+    "acceptButton": "Accept",
+    "cancelButton": "Cancel",
+    "closeButton": "Close",
+    "okButton": "OK",
+    "no": "No",
+    "yes": "Yes"
   }
 }

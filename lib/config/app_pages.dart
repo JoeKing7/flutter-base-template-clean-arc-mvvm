@@ -9,6 +9,13 @@ import '../presentation/screens/login_screen.dart';
 class AppPages {
   static const initial = Routes.LOGIN;
 
+  static const List<String> publicRoutes = [
+    Routes.SPLASH_SCREEN,
+    Routes.LOGIN,
+    // Routes.REGISTER,
+    // Routes.RECOVER_PASSWORD,
+  ];
+
   static final routes = [
     GetPage(
       name: Routes.LOGIN,

@@ -12,12 +12,13 @@ import 'package:base_template/core/utils/app_translations.dart';
 import 'package:base_template/config/bindings/initial_bindings.dart';
 import 'package:base_template/core/config/env_config.dart';
 import 'package:base_template/core/utils/preferences_helper.dart';
-import 'package:base_template/presentation/widgets/error_custom.dart';
+import 'package:base_template/presentation/widgets/app_widget_error.dart';
 import 'package:base_template/services/session_service.dart';
 import 'package:translations_loader/translations_loader.dart';
 import 'package:base_template/presentation/viewmodels/app_controller.dart';
 import 'package:base_template/core/config/app_colors.dart';
 import 'package:base_template/core/config/app_theme.dart';
+import 'package:base_template/services/user_inactivity_service.dart';
 
 class AppInitializer {
   Future<void> init() async {
@@ -47,12 +48,13 @@ class AppInitializer {
         return true;
       }());
       if (isDebug) return ErrorWidget(errorDetails.exception);
-      return CustomWidgetError(errorDetails: errorDetails);
+      return AppWidgetError(errorDetails: errorDetails);
     };
     final EnvConfig envConfig = EnvConfig();
     SessionService.setCipherKey(envConfig.cipherKey);
     SessionService.setIvKey(envConfig.cipherIv);
     // Agregar estas líneas antes de SentryFlutter.init
+    Get.put<UserInactivityService>(UserInactivityService(), permanent: true);
     final appController = Get.put(AppController(), permanent: true);
     await appController.initializeLocale();
     appController.translations = await TranslationsLoader.loadTranslations(
@@ -117,7 +119,15 @@ class MyApp extends StatelessWidget {
         () => GetMaterialApp(
           builder: (context, child) {
             return MediaQuery.withClampedTextScaling(
-                minScaleFactor: 0.8, maxScaleFactor: 1.0, child: child!);
+                minScaleFactor: 0.8,
+                maxScaleFactor: 1.0,
+                child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () =>
+                        appController.userInactivityService.onUserInteraction(),
+                    onPanDown: (_) =>
+                        appController.userInactivityService.onUserInteraction(),
+                    child: child!));
           },
           initialBinding: InitialBindings(),
           theme: AppTheme.light,
