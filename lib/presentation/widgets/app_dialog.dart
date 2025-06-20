@@ -1,8 +1,7 @@
-import 'package:base_template/core/config/app_text_styles.dart';
-import 'package:base_template/presentation/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:base_template/presentation/widgets/app_text.dart';
 import 'package:base_template/core/config/app_colors.dart';
 
 class AppDialog {
